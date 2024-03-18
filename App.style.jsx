@@ -5,7 +5,11 @@ import { StyleSheet } from "react-native";
         flex: 1
     },
     img_background: {
-        flex: 1
+        flex: 1,
+        backgroundColor: "black"
+    },
+    img: {
+        opacity: 0.8
     }
 })
 export { s };
