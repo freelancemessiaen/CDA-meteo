@@ -1,21 +1,25 @@
 import { s } from './Home.style'
 import  { MeteoAPI } from '../api/meteo'
 import { Text, View } from 'react-native'
+import { Txt } from '../components/Txt/Txt'
+import { MeteoBasic } from '../components/MeteoBasic/Meteobasic'
 // Import des fonctions pour gérer la localisation depuis Expo
 import {requestForegroundPermissionsAsync, getCurrentPositionAsync} from 'expo-location'; 
 // Import des fonctions useEffect et useState de React
 import { useEffect, useState } from 'react'; 
+import { getWeatherInterpretation } from '../components/services/meteo-services'  // Service pour interpréter la météo
+
 export function Home () {
     const [coords ,setCoords] = useState(); // Déclaration d'un état pour stocker les coordonnées de l'utilisateur 
     const [weather ,setWeather] = useState(); 
-
+    const currentWeather = weather?.current_weather; // Données météorologiques actuelles
     useEffect(() => { // Utilisation de useEffect pour exécuter une action une seule fois après le rendu initial
         getUserCoords(); // Appel de la fonction getUserCoords
     },[])
 
     useEffect(() => { 
         if (coords) {
-            fetchWeather(coords)
+            fetchWeather(coords) // Appel de fetchWeather lorsque les coordonnées sont disponibles
         }
     },[coords])
 
@@ -33,20 +37,22 @@ export function Home () {
 
     async function  fetchWeather (coordinates) {
         const weatherResponse = await MeteoAPI.fetchWeatherFromCoords(coordinates);
-        setWeather(weatherResponse);
+        setWeather(weatherResponse); // Mise à jour des données météorologiques dans l'état
     }
-    console.log('====================================');
-    console.log(weather);
-    console.log('====================================');
+
     return (
+        currentWeather?
         <>
-            <View style={s.meteo_basic}></View>
+            <View style={s.meteo_basic}>
+                <MeteoBasic 
+                temperature={Math.round(currentWeather?.temperature)}
+                city="Paris"
+                interpretation={getWeatherInterpretation(currentWeather.weathercode)}
+               />
+            </View>
             <View style={s.searchbar}></View>
             <View style={s.meteo_advanced}></View>
         </>
+        : null
     )
 }
-
- 
-
-

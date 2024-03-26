@@ -6,7 +6,8 @@ import { StyleSheet } from "react-native";
     },
     img_background: {
         flex: 1,
-        backgroundColor: "black"
+        backgroundColor: "black",
+        padding: 20
     },
     img: {
         opacity: 0.8
