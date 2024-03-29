@@ -9,12 +9,15 @@ import {requestForegroundPermissionsAsync, getCurrentPositionAsync} from 'expo-l
 // Import des fonctions useEffect et useState de React
 import { useEffect, useState } from 'react'; 
 import { getWeatherInterpretation } from '../components/services/meteo-services'  // Service pour interpréter la météo
+import { useNavigation } from '@react-navigation/native'
+import { Container } from '../components/Container/Container'
 
 export function Home () {
     const [coords ,setCoords] = useState(); // Déclaration d'un état pour stocker les coordonnées de l'utilisateur 
     const [weather ,setWeather] = useState(); 
     const currentWeather = weather?.current_weather; // Données météorologiques actuelles
     const [city, setCity] = useState(city);
+    const nav = useNavigation();
     useEffect(() => { // Utilisation de useEffect pour exécuter une action une seule fois après le rendu initial
         getUserCoords(); // Appel de la fonction getUserCoords
     },[])
@@ -24,9 +27,7 @@ export function Home () {
             fetchWeather(coords) 
             fetchCity(coords)
         }
-    },[coords])
-
-    
+    },[coords])    
     async function getUserCoords() { // Définition de la fonction asynchrone getUserCoords pour obtenir les coordonnées de l'utilisateur
         let {status } = await requestForegroundPermissionsAsync(); // Demande de permissions d'accès à la localisation
         if (status === "granted") { // Si les permissions sont accordées
@@ -47,15 +48,19 @@ export function Home () {
         const cityResponse = await MeteoAPI.fetchCityFromCoords(coordinates);
         setCity(cityResponse);
     }
-    console.log(weather);
+
+    function goToForecastPage() {
+        nav.navigate("Forecast")
+    }
     return (
         currentWeather?
-        <>
+        <Container>
             <View style={s.meteo_basic}>
                 <MeteoBasic 
                 temperature={Math.round(currentWeather?.temperature)}
                 city={city}
                 interpretation={getWeatherInterpretation(currentWeather.weathercode)}
+                onPress= {goToForecastPage}
                />
             </View>
             <View style={s.searchbar}></View>
@@ -65,7 +70,7 @@ export function Home () {
                     dusk={weather.daily.sunrise[0].split("T")[1]} 
                     dawn={weather.daily.sunset[0].split("T")[1]}/>
             </View>
-        </>
+        </Container>
         : null
     )
 }
