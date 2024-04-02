@@ -50,7 +50,7 @@ export function Home () {
     }
 
     function goToForecastPage() {
-        nav.navigate("Forecast")
+        nav.navigate("Forecast",{city, ...weather.daily})
     }
     return (
         currentWeather?
