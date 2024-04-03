@@ -19,7 +19,7 @@ const s = StyleSheet.create({
         justifyContent: "space-between",
         
     }, temperature: {
-        fontSize: 150
+        fontSize: 100
     }
 });
 

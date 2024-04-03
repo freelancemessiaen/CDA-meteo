@@ -14,7 +14,11 @@ const s = StyleSheet.create( {
     },
     subtitle: {
         fontSize: 20
+    },
+    forecastList: {
+        marginTop: 50
     }
+
 });
 
 export { s };

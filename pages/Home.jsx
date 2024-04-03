@@ -1,6 +1,6 @@
 import { s } from './Home.style'
 import  { MeteoAPI } from '../api/meteo'
-import { Text, View } from 'react-native'
+import { Alert, Text, View } from 'react-native'
 import { Txt } from '../components/Txt/Txt'
 import { MeteoBasic } from '../components/MeteoBasic/Meteobasic'
 import { MeteoAdvanced } from '../components/MeteoAdvanced/MeteoAdvanced'
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { getWeatherInterpretation } from '../components/services/meteo-services'  // Service pour interpréter la météo
 import { useNavigation } from '@react-navigation/native'
 import { Container } from '../components/Container/Container'
+import { SearchBar } from '../components/SearchBar/SearchBar'
 
 export function Home () {
     const [coords ,setCoords] = useState(); // Déclaration d'un état pour stocker les coordonnées de l'utilisateur 
@@ -18,6 +19,7 @@ export function Home () {
     const currentWeather = weather?.current_weather; // Données météorologiques actuelles
     const [city, setCity] = useState(city);
     const nav = useNavigation();
+
     useEffect(() => { // Utilisation de useEffect pour exécuter une action une seule fois après le rendu initial
         getUserCoords(); // Appel de la fonction getUserCoords
     },[])
@@ -28,6 +30,7 @@ export function Home () {
             fetchCity(coords)
         }
     },[coords])    
+
     async function getUserCoords() { // Définition de la fonction asynchrone getUserCoords pour obtenir les coordonnées de l'utilisateur
         let {status } = await requestForegroundPermissionsAsync(); // Demande de permissions d'accès à la localisation
         if (status === "granted") { // Si les permissions sont accordées
@@ -44,13 +47,25 @@ export function Home () {
         setWeather(weatherResponse); // Mise à jour des données météorologiques dans l'état
     }
 
-    async function  fetchCity (coordinates) {
-        const cityResponse = await MeteoAPI.fetchCityFromCoords(coordinates);
-        setCity(cityResponse);
-    }
-
     function goToForecastPage() {
         nav.navigate("Forecast",{city, ...weather.daily})
+    }
+
+  async function fetchCity(coordinates) {
+    const cityResponse = await MeteoAPI.fetchCityFromCoords(
+      coordinates
+    );
+    setCity(cityResponse);
+  }
+
+    async function  fetchCoordsByCity (city) {
+        try {
+            const coords = await MeteoAPI.fetchCoordsFromCity(city);
+            setCoords(coords);
+        } catch (e) {
+            Alert.alert("Désoler",e)
+        }
+
     }
     return (
         currentWeather?
@@ -63,7 +78,9 @@ export function Home () {
                 onPress= {goToForecastPage}
                />
             </View>
-            <View style={s.searchbar}></View>
+            <View style={s.searchbar}>
+                <SearchBar onSubmit={fetchCoordsByCity}/> 
+            </View>
             <View style={s.meteo_advanced}>
                 <MeteoAdvanced 
                     wind={currentWeather.windspeed} 

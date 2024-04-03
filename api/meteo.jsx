@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Alert } from "react-native";
 
 export class MeteoAPI {
   static async fetchWeatherFromCoords(coords) {
@@ -9,7 +10,7 @@ export class MeteoAPI {
     ).data;
   }
 
-    static async fetchCityFromCoords(coords) {
+  static async fetchCityFromCoords(coords) {
     const {
       address: { city, village, town },
     } = (
@@ -19,4 +20,18 @@ export class MeteoAPI {
     ).data;
     return city || village || town;
   }
+
+    static async fetchCoordsFromCity(city) {
+      try {
+      const {latitude: lat, longitude: lng } = (await axios.get(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=fr&format=json`
+      )).data.results[0]
+      return { lat,lng}
+      }catch(e){
+        throw "La ville n'est pas trouvé"
+      }
+  }
 }
+
+
+
